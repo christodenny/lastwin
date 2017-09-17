@@ -42,7 +42,7 @@ def getTeamStats(teamname):
             date = getDate(resp)
             lastWin = parse(date + ' ' + str(year))
             today = datetime.now()
-            return render_template('results.html', count=(today - lastWin).days, school=teamname)
+            return render_template('results.html', count=(today - lastWin).days, school=teamname, school_id=teamIds[teamname])
 
 if __name__ == "__main__":
     app.run()
