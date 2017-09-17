@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ school }}
+{% endblock %}
+{% block content %}
+<h1>{{ count }} day{% if count != 1 %}s{% endif %} since {{ school }} won</h1>
+<p>Want to search for another college?</p>
+{% endblock %}

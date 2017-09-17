@@ -1,0 +1,26 @@
+.container {
+  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+}
+
+h1, p, #search-form {
+  text-align: center;
+}
+
+h1 {
+  font-size: 10em;
+}
+
+p {
+  font-size: 1.5em;
+}
+
+#search-bar {
+  width: 40%;
+  font-size: 2em;
+}
+
+#search-button {
+  font-size: 2em;
+}

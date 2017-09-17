@@ -2,7 +2,7 @@ import requests
 import difflib
 from dateutil.parser import parse
 from datetime import *
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 teamIds = {}
 resp = requests.get('http://www.espn.com/college-football/teams').text
@@ -24,7 +24,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return 'hello world'
+    return render_template('index.html')
 
 def getDate(body):
     lastWin = body.rfind('greenfont')
@@ -42,8 +42,7 @@ def getTeamStats(teamname):
             date = getDate(resp)
             lastWin = parse(date + ' ' + str(year))
             today = datetime.now()
-            return str((today - lastWin).days)
-            break
+            return render_template('results.html', count=(today - lastWin).days, school=teamname)
 
 if __name__ == "__main__":
     app.run()
