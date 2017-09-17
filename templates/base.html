@@ -11,6 +11,12 @@
     <form id="search-form">
       <input type="text" name="search" placeholder="College Name" id="search-bar">
       <input type="submit" id="search-button" value="Search"></input>
+      <div class="autocomplete-box" style="visibility: hidden">
+      </div>
+      <div class="autocomplete-box" style="visibility: hidden">
+      </div>
+      <div class="autocomplete-box" style="visibility: hidden">
+      </div>
     </form>
   </div>
   <script src="{{ url_for('static', filename='searchbar.js') }}"></script>
