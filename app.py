@@ -18,7 +18,7 @@ try:
         teamIds[teamName] = teamId
         start += 1
 except:
-    x = 5
+    pass
 
 app = Flask(__name__)
 
