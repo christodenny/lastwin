@@ -22,6 +22,7 @@ except:
 
 teamIds['ut austin'] = teamIds['texas']
 teamIds['ut'] = teamIds['texas']
+teamIds['longhorn'] = teamIds['texas']
 
 app = Flask(__name__)
 
