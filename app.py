@@ -15,7 +15,7 @@ try:
         nameStart = resp.index('>', start) + 1
         nameEnd = resp.index('<', nameStart)
         teamName = resp[nameStart:nameEnd]
-        teamIds[teamName] = teamId
+        teamIds[teamName.lower()] = (teamId, teamName)
         start += 1
 except:
     pass
@@ -35,14 +35,15 @@ def getDate(body):
 
 @app.route('/<teamname>')
 def getTeamStats(teamname):
-    teamname = difflib.get_close_matches(teamname, teamIds.keys(), 1, 0.2)[0]
+    teamname = difflib.get_close_matches(teamname.lower(), teamIds.keys(), 1, 0.2)[0]
+    team_id, teamname = teamIds[teamname]
     for year in range(2017, 2001, -1):
-        resp = requests.get('http://www.espn.com/college-football/team/schedule/_/id/' + teamIds[teamname] + '/year/' + str(year)).text
+        resp = requests.get('http://www.espn.com/college-football/team/schedule/_/id/' + team_id + '/year/' + str(year)).text
         if 'greenfont' in resp:
             date = getDate(resp)
             lastWin = parse(date + ' ' + str(year))
             today = datetime.now()
-            return render_template('results.html', count=(today - lastWin).days, school=teamname, school_id=teamIds[teamname])
+            return render_template('results.html', count=(today - lastWin).days, school=teamname, school_id=team_id)
 
 if __name__ == "__main__":
     app.run()
