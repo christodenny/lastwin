@@ -20,6 +20,9 @@ try:
 except:
     pass
 
+teamIds['ut austin'] = teamIds['texas']
+teamIds['ut'] = teamIds['texas']
+
 app = Flask(__name__)
 
 @app.route('/')
