@@ -41,7 +41,7 @@ def getDate(body):
 def getTeamStats(teamname):
     teamname = difflib.get_close_matches(teamname.lower(), teamIds.keys(), 1, 0.2)[0]
     team_id, teamname = teamIds[teamname]
-    for year in range(2017, 2001, -1):
+    for year in range(datetime.now().year, 2001, -1):
         resp = requests.get('http://www.espn.com/college-football/team/schedule/_/id/' + team_id + '/year/' + str(year)).text
         if 'greenfont' in resp:
             date = getDate(resp)
