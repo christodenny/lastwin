@@ -20,9 +20,10 @@ try:
 except:
     pass
 
-teamIds['ut austin'] = teamIds['texas']
-teamIds['ut'] = teamIds['texas']
-teamIds['longhorn'] = teamIds['texas']
+teamIds['texas'] = teamIds['texas-longhorns']
+teamIds['ut austin'] = teamIds['texas-longhorns']
+teamIds['ut'] = teamIds['texas-longhorns']
+teamIds['longhorn'] = teamIds['texas-longhorns']
 
 app = Flask(__name__)
 
