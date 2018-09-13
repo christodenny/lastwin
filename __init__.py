@@ -14,14 +14,14 @@ def getTeams():
             cursor = resp.index(searchString, cursor)
             idEnd = resp.index('/', cursor + skipLength)
             teamId = resp[cursor+skipLength : idEnd]
+            print(teamId)
             if teamId in teamSet:
-                # to be safe, advance to next title link
-                cursor = resp.index(searchString, cursor)
                 # skip over <a> ending angle bracket
-                cursor = resp.index('h2', cursor)
+                cursor = resp.index('<h2', cursor)
                 nameStart = resp.index('>', cursor) + 1
                 nameEnd = resp.index('<', nameStart)
                 teamName = unescape(resp[nameStart:nameEnd])
+                print(teamName)
                 # ex: teamMap['texas longhorns'] = (251, 'Texas Longhorns')
                 teamMap[teamName.lower()] = (teamId, teamName)
             else:
