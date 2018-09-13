@@ -1,11 +1,11 @@
 import requests
 import difflib
-from .utils import unescape
+import html
 
 def getTeams():
     teamMap = {}
     try:
-        resp = requests.get('http://www.espn.com/college-football/teams').text
+        resp = requests.get('http://www.espn.com/college-football/teams', timeout=15).text
         searchString = '/college-football/team/_/id/'
         skipLength = len(searchString)
         teamSet = set()
@@ -14,14 +14,14 @@ def getTeams():
             cursor = resp.index(searchString, cursor)
             idEnd = resp.index('/', cursor + skipLength)
             teamId = resp[cursor+skipLength : idEnd]
-            print(teamId)
+            # print(teamId)
             if teamId in teamSet:
                 # skip over <a> ending angle bracket
                 cursor = resp.index('<h2', cursor)
                 nameStart = resp.index('>', cursor) + 1
                 nameEnd = resp.index('<', nameStart)
-                teamName = unescape(resp[nameStart:nameEnd])
-                print(teamName)
+                teamName = html.unescape(resp[nameStart:nameEnd])
+                # print(teamName)
                 # ex: teamMap['texas longhorns'] = (251, 'Texas Longhorns')
                 teamMap[teamName.lower()] = (teamId, teamName)
             else:

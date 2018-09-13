@@ -1,5 +1,4 @@
 import requests
-import difflib
 from dateutil.parser import parse
 from datetime import *
 from flask import Flask, jsonify, render_template, request
@@ -23,7 +22,7 @@ def getTeamStats(teamname):
     teamname = fuzzymatch(teamname.lower(), 1)[0]
     team_id, teamname = TeamsByName[teamname]
     for year in range(datetime.now().year, 2001, -1):
-        resp = requests.get('http://www.espn.com/college-football/team/schedule/_/id/' + team_id + '/year/' + str(year)).text
+        resp = requests.get('http://www.espn.com/college-football/team/schedule/_/id/' + team_id + '/year/' + str(year), timeout=15).text
         if 'greenfont' in resp:
             date = getDate(resp)
             lastWin = parse(date + ' ' + str(year))
