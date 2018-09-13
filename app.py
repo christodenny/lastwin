@@ -2,7 +2,7 @@ import requests
 from dateutil.parser import parse
 from datetime import *
 from flask import Flask, jsonify, render_template, request
-from __init__ import TeamsByName, fuzzymatch
+from utils import TeamsByName, fuzzymatch
 
 app = Flask(__name__)
 
