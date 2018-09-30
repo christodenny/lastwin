@@ -11,10 +11,10 @@ def index():
     return render_template('index.html')
 
 def getDate(body):
-    lastWin = body.rfind('greenfont')
-    rowteam = body[:lastWin].rfind('row team')
-    dateStart = body[rowteam:].index(', ') + 2 + rowteam
-    dateEnd = body[dateStart:].index('<') + dateStart
+    lastWin = body.rfind('clr-positive')
+    rowIdx = body[:lastWin].rfind('tr')
+    dateStart = rowIdx + body[rowIdx:].index(', ') + 2
+    dateEnd = dateStart + body[dateStart:].index('<')
     return body[dateStart:dateEnd]
 
 @app.route('/<teamname>')
@@ -22,8 +22,8 @@ def getTeamStats(teamname):
     teamname = fuzzymatch(teamname.lower(), 1)[0]
     team_id, teamname = TeamsByName[teamname]
     for year in range(datetime.now().year, 2001, -1):
-        resp = requests.get('http://www.espn.com/college-football/team/schedule/_/id/' + team_id + '/year/' + str(year), timeout=15).text
-        if 'greenfont' in resp:
+        resp = requests.get('http://www.espn.com/college-football/team/schedule/_/id/' + team_id + '/season/' + str(year), timeout=15).text
+        if 'clr-positive' in resp:
             date = getDate(resp)
             lastWin = parse(date + ' ' + str(year))
             today = datetime.now()
