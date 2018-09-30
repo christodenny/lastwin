@@ -15,7 +15,6 @@ def getDate(body):
     rowIdx = body[:lastWin].rfind('tr')
     dateStart = rowIdx + body[rowIdx:].index(', ') + 2
     dateEnd = dateStart + body[dateStart:].index('<')
-    print(lastWin, rowIdx, dateStart, dateEnd)
     return body[dateStart:dateEnd]
 
 @app.route('/<teamname>')
