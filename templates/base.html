@@ -1,23 +1,55 @@
 <!DOCTYPE html>
 <head>
   <title>{% block title %}{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <!-- Metadata -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
 </head>
 <body>
+  <!-- Nav -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-football-ball"></i>&nbsp;
+      <b>last</b>win
+    </a>
+  </nav>
+
   <div class="container">
     {% block content %}
     {% endblock %}
-    <form id="search-form" autocomplete="off">
-      <input type="text" name="search" placeholder="College Name" id="search-bar">
-      <input type="submit" id="search-button" value="Search"></input>
-      <div class="autocomplete-box" style="visibility: hidden">
+    <form id="search-form" class="text-center" autocomplete="off">
+      <!-- Input group -->
+      <div class="input-group input-group-lg mx-auto" id="search-group">
+        <input type="text" id="search-bar" class="form-control form-control-lg" name="search" placeholder="College Name">
+        <div class="input-group-append">
+          <input type="submit" id="search-button" class="btn btn-primary btn-lg" value="Search"></input>
+        </div>
       </div>
-      <div class="autocomplete-box" style="visibility: hidden">
-      </div>
-      <div class="autocomplete-box" style="visibility: hidden">
+      <!-- Autocomplete boxes -->
+      <div class="list-group">
+        <button type="button" class="list-group-item list-group-item-action autocomplete-box mx-auto" style="visibility: hidden"></button>
+        <button type="button" class="list-group-item list-group-item-action autocomplete-box mx-auto" style="visibility: hidden"></button>
+        <button type="button" class="list-group-item list-group-item-action autocomplete-box mx-auto" style="visibility: hidden"></button>
       </div>
     </form>
   </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <span class="text-muted">Made with &hearts; in San Palo Menlo View, CA</span>
+    </div>
+  </footer>
+
   <script src="{{ url_for('static', filename='searchbar.js') }}"></script>
 </body>
