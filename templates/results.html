@@ -7,8 +7,8 @@
   {{ count }} day{% if count != 1 %}s{% endif %} since <br/>
   {{ school }} won
 </h1>
-<a href="http://www.espn.com/college-football/team/_/id/{{ school_id }}">
-  <img src="http://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/{{ school_id }}.png&h=200&w=200">
+<a href="{{ espnLink }}">
+  <img src="{{ imgLink }}">
 </a>
 <p class="mt-5">Want to search for another college?</p>
 {% endblock %}
