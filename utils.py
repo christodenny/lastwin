@@ -28,7 +28,7 @@ def getCfbTeams():
                 teamSet.add(teamId)
             cursor += 1
     except ValueError:
-        print('{} teams captured'.format(len(teamMap)))
+        print('{} CFB teams captured'.format(len(teamMap)))
         return teamMap
     except:
         print('getTeams: unexpected error.')
@@ -46,21 +46,21 @@ def getNflTeams():
             cursor = resp.index(searchString, cursor)
             idEnd = resp.index('/', cursor + skipLength)
             teamId = resp[cursor+skipLength : idEnd]
-            print(teamId)
+            # print(teamId)
             if teamId in teamSet:
                 # skip over <a> ending angle bracket
                 cursor = resp.index('<h2', cursor)
                 nameStart = resp.index('>', cursor) + 1
                 nameEnd = resp.index('<', nameStart)
                 teamName = html.unescape(resp[nameStart:nameEnd])
-                print(teamName)
+                # print(teamName)
                 # ex: teamMap['texas longhorns'] = (251, 'Texas Longhorns')
                 teamMap[teamName.lower()] = (teamId, teamName, "nfl")
             else:
                 teamSet.add(teamId)
             cursor += 1
     except ValueError:
-        print('{} teams captured'.format(len(teamMap)))
+        print('{} NFL teams captured'.format(len(teamMap)))
         return teamMap
     except:
         print('getTeams: unexpected error.')
