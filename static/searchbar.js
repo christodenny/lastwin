@@ -1,7 +1,9 @@
 var searchBar = document.getElementById("search-bar");
 function search(event) {
   event.preventDefault();
-  window.location.href = "/" + encodeURIComponent(searchBar.value);
+  var dt = new Date();
+  var tz = dt.getTimezoneOffset();
+  window.location.href = "/" + encodeURIComponent(searchBar.value) + "?tz=" + tz;
 }
 
 var req;
@@ -20,7 +22,9 @@ for (var i = 0; i < 3; i++) {
   var element = autocompleteBoxes[i];
   element.addEventListener("click", function(e) {
     return function() {
-      window.location = "/" + e.textContent;
+      var dt = new Date();
+      var tz = dt.getTimezoneOffset();
+      window.location = "/" + e.textContent + "?tz=" + tz;
     }
   }(element));
 }

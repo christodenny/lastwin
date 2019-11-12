@@ -46,8 +46,14 @@ def getTeamStats(teamname):
         if 'clr-positive' in resp:
             date = getDate(resp)
             lastWin = parse(date + ' ' + str(year))
-            today = datetime.now()
-            return render_template('results.html', count=(today - lastWin).days, school=teamname, school_id=team_id, espnLink=espnLink, imgLink=imgLink)
+            utcnow = datetime.utcnow()
+            tz = request.args.get('tz')
+            if tz is None:
+                timezone = timedelta()
+            else:
+                timezone = timedelta(minutes=int(request.args.get('tz')))
+            daysSinceWin = max(((utcnow - timezone) - lastWin).days, 0)
+            return render_template('results.html', count=daysSinceWin, school=teamname, school_id=team_id, espnLink=espnLink, imgLink=imgLink)
 
 @app.route('/autocomplete')
 def autocomplete():
