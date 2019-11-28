@@ -6,6 +6,9 @@ from utils import TeamsByName, fuzzymatch
 
 app = Flask(__name__)
 
+# map from team_id to (daysSinceWin, refreshTime)
+cache = {}
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -32,16 +35,20 @@ def getDate(body):
 def getTeamStats(teamname):
     teamname = fuzzymatch(teamname.lower(), 1)[0]
     team_id, teamname, division = TeamsByName[teamname]
-    for year in range(datetime.now().year, 2001, -1):
-        if division == "cfb":
-            baseUrl = 'http://www.espn.com/college-football/team/schedule/_/id/'
-            espnLink = 'http://www.espn.com/college-football/team/_/id/' + team_id
-            imgLink = 'http://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/' + team_id + '.png&h=200&w=200'
-        else:
-            baseUrl = 'https://www.espn.com/nfl/team/schedule/_/name/'
-            espnLink = 'http://www.espn.com/nfl/team/_/id/' + team_id
-            imgLink = 'http://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/' + team_id + '.png&h=200&w=200'
+    if division == "cfb":
+        baseUrl = 'http://www.espn.com/college-football/team/schedule/_/id/'
+        espnLink = 'http://www.espn.com/college-football/team/_/id/' + team_id
+        imgLink = 'http://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/' + team_id + '.png&h=200&w=200'
+    else:
+        baseUrl = 'https://www.espn.com/nfl/team/schedule/_/name/'
+        espnLink = 'http://www.espn.com/nfl/team/_/id/' + team_id
+        imgLink = 'http://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/' + team_id + '.png&h=200&w=200'
 
+    if team_id in cache:
+        if (datetime.utcnow() - cache[team_id][1]).total_seconds() <= 5:
+            print("hitting cache for " + teamname)
+            return render_template('results.html', count=cache[team_id][0], school=teamname, school_id=team_id, espnLink=espnLink, imgLink=imgLink)
+    for year in range(datetime.now().year, 2001, -1):
         resp = requests.get(baseUrl + team_id + '/season/' + str(year), timeout=15).text
         if 'clr-positive' in resp:
             date = getDate(resp)
@@ -53,6 +60,7 @@ def getTeamStats(teamname):
             else:
                 timezone = timedelta(minutes=int(request.args.get('tz')))
             daysSinceWin = max(((utcnow - timezone) - lastWin).days, 0)
+            cache[team_id] = (daysSinceWin, datetime.utcnow())
             return render_template('results.html', count=daysSinceWin, school=teamname, school_id=team_id, espnLink=espnLink, imgLink=imgLink)
 
 @app.route('/autocomplete')
