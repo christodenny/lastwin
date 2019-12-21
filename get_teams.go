@@ -1,11 +1,8 @@
-package teamfetcher
+package main
 
 import (
 	"fmt"
 	"html"
-	"io/ioutil"
-	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -13,21 +10,19 @@ var (
 	collegeTeamsURL = "http://www.espn.com/college-football/teams"
 )
 
-// GetCfbTeams returns all college football teams.
-func GetCfbTeams() string {
-	resp, err := http.Get(collegeTeamsURL)
-	if err != nil {
-		return "failed to get http"
-	}
-	defer resp.Body.Close()
-	rawText, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "failed to read http response body"
-	}
-	body := string(rawText[:])
+// Team is a struct storing team name and id
+type Team struct {
+	ID       string
+	Name     string
+	Division string
+}
+
+func getCfbTeams() map[string]Team {
+	body := getHTML(collegeTeamsURL)
 	searchString := "/college-football/team/_/id/"
 	skipLength := len(searchString)
 	teamSet := map[string]bool{}
+	teamMap := map[string]Team{}
 	cursor := 0
 	allTeams := ""
 	for cursor < len(body) {
@@ -50,11 +45,12 @@ func GetCfbTeams() string {
 			teamName := html.UnescapeString(body[nameStart:nameEnd])
 			cursor = nameEnd
 			teamSet[teamID] = true
+			teamMap[strings.ToLower(teamName)] = Team{teamID, teamName, "cfb"}
 			allTeams += teamName + "\n"
 		} else {
 			cursor++
 		}
 	}
-	fmt.Println(strconv.Itoa(len(teamSet)))
-	return allTeams
+	fmt.Printf("%d CFB teams captured\n", len(teamMap))
+	return teamMap
 }
