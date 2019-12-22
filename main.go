@@ -88,7 +88,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			now := time.Now()
 			tzs, ok := r.URL.Query()["tz"]
-			if !ok || len(tzs[0]) < 1 {
+			if ok && len(tzs[0]) > 0 {
 				tz, err := strconv.Atoi(tzs[0])
 				if err != nil {
 					now = now.Add(-time.Minute * time.Duration(tz))
