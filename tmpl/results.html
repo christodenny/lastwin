@@ -1,0 +1,14 @@
+{{ template "base" . }}
+{{ define "title" }}
+{{ .School }}
+{{ end }}
+{{ define "content" }}
+<h1>
+  {{ .Count }} day{{ if (ne .Count 1) }}s{{ end }} since <br/>
+  {{ .School }} won
+</h1>
+<a href="{{ .EspnLink }}">
+  <img src="{{ .ImgLink }}">
+</a>
+<p class="mt-5">Want to search for another college?</p>
+{{ end }}
