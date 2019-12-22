@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"strings"
+	"time"
 )
 
 var (
@@ -16,6 +17,12 @@ type Team struct {
 	ID       string
 	Name     string
 	Division string
+}
+
+// CacheEntry stores cache of last time team one
+type CacheEntry struct {
+	lastRefresh time.Time
+	lastWin     int
 }
 
 func getCfbTeams() map[string]Team {

@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -16,8 +15,10 @@ import (
 
 var (
 	port         = "8080"
+	ttl          = time.Second * 5 // Cache ttl in seconds
 	allTeams     = map[string]Team{}
 	allTeamNames = []string{}
+	cache        = map[string]CacheEntry{}
 
 	urls = map[string]map[string]string{
 		"cfb": {
@@ -42,27 +43,6 @@ type ResultData struct {
 	ImgLink  string
 }
 
-func loadConfigs() {
-	p := os.Getenv("PORT")
-	if p != "" {
-		log.Printf("Using port %s\n", p)
-		port = p
-	} else {
-		log.Println("$PORT not provided, using default port 8080")
-	}
-}
-
-func loadTeams() {
-	for k, v := range getCfbTeams() {
-		allTeams[k] = v
-		allTeamNames = append(allTeamNames, k)
-	}
-	for k, v := range getNflTeams() {
-		allTeams[k] = v
-		allTeamNames = append(allTeamNames, k)
-	}
-}
-
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("tmpl/base.html", "tmpl/index.html")
 	if err != nil {
@@ -84,6 +64,17 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 	team := allTeams[teamname]
 	espnLink := fmt.Sprintf(urls[team.Division]["espn"], team.ID)
 	imgLink := fmt.Sprintf(urls[team.Division]["img"], team.ID)
+	if entry, ok := cache[teamname]; ok && time.Since(entry.lastRefresh) < ttl {
+		resultData := ResultData{Count: entry.lastWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
+		tmpl, err := template.ParseFiles("tmpl/base.html", "tmpl/results.html")
+		if err != nil {
+			fmt.Fprintf(w, "Error parsing template file")
+			return
+		}
+		log.Printf("Handling %s from cache\n", teamname)
+		tmpl.ExecuteTemplate(w, "results.html", resultData)
+		return
+	}
 	for year := time.Now().Year(); year >= 2001; year-- {
 		queryURL := fmt.Sprintf(urls[team.Division]["query"], team.ID, strconv.Itoa(year))
 		body := getHTML(queryURL)
@@ -110,6 +101,8 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, "Error parsing template file")
 				return
 			}
+			cache[teamname] = CacheEntry{time.Now(), daysSinceWin}
+			log.Printf("Handling %s from espn\n", teamname)
 			tmpl.ExecuteTemplate(w, "results.html", resultData)
 			return
 		}
@@ -140,6 +133,6 @@ func main() {
 	fileServer := http.FileServer(http.Dir("static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
-	log.Printf("Starting server on :%s", port)
+	log.Printf("Starting server on port %s", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }

@@ -2,11 +2,45 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/sahilm/fuzzy"
 )
+
+func loadConfigs() {
+	p := os.Getenv("PORT")
+	if p != "" {
+		log.Printf("Using port %s\n", p)
+		port = p
+	} else {
+		log.Println("$PORT not provided, using default port 8080")
+	}
+	t := os.Getenv("TTL")
+	if t != "" {
+		log.Printf("Using cache ttl of %s seconds\n", t)
+		if val, err := strconv.Atoi(t); err != nil {
+			ttl = time.Second * time.Duration(val)
+		}
+	} else {
+		log.Println("$TTL not provided, using default cache ttl of 5 seconds")
+	}
+}
+
+func loadTeams() {
+	for k, v := range getCfbTeams() {
+		allTeams[k] = v
+		allTeamNames = append(allTeamNames, k)
+	}
+	for k, v := range getNflTeams() {
+		allTeams[k] = v
+		allTeamNames = append(allTeamNames, k)
+	}
+}
 
 func getRankedTeams(query string) []string {
 	matchedTeamNames := []string{}
