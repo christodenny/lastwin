@@ -35,7 +35,7 @@ function autocomplete() {
     for (var i = 0; i < 3; i++) {
       var box = autocompleteBoxes[i];
       if (i < data.length) {
-        box.textContent = data[i].name;
+        box.textContent = data[i];
         box.style.visibility = "visible";
       } else {
         box.style.visibility = "hidden";

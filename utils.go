@@ -4,7 +4,18 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/sahilm/fuzzy"
 )
+
+func getRankedTeams(query string) []string {
+	matchedTeamNames := []string{}
+	matches := fuzzy.Find(query, allTeamNames)
+	for i := range matches {
+		matchedTeamNames = append(matchedTeamNames, matches[i].Str)
+	}
+	return matchedTeamNames
+}
 
 func getHTML(url string) string {
 	resp, err := http.Get(url)
