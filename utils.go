@@ -34,11 +34,11 @@ func loadConfigs() {
 func loadTeams() {
 	for k, v := range getCfbTeams() {
 		allTeams[k] = v
-		allTeamNames = append(allTeamNames, k)
+		allTeamNames = append(allTeamNames, v.Name)
 	}
 	for k, v := range getNflTeams() {
 		allTeams[k] = v
-		allTeamNames = append(allTeamNames, k)
+		allTeamNames = append(allTeamNames, v.Name)
 	}
 }
 

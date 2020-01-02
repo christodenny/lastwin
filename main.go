@@ -61,7 +61,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	teamname = matchedTeamNames[0]
-	team := allTeams[teamname]
+	team := allTeams[strings.ToLower(teamname)]
 	espnLink := fmt.Sprintf(urls[team.Division]["espn"], team.ID)
 	imgLink := fmt.Sprintf(urls[team.Division]["img"], team.ID)
 	if entry, ok := cache[teamname]; ok && time.Since(entry.lastRefresh) < ttl {
