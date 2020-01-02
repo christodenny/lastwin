@@ -54,14 +54,14 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	teamname := strings.ToLower(vars["teamname"])
+	teamname := vars["teamname"]
 	matchedTeamNames := getRankedTeams(teamname)
 	if len(matchedTeamNames) == 0 {
 		fmt.Fprintf(w, "Could not find a team")
 		return
 	}
 	teamname = matchedTeamNames[0]
-	team := allTeams[strings.ToLower(teamname)]
+	team := allTeams[teamname]
 	espnLink := fmt.Sprintf(urls[team.Division]["espn"], team.ID)
 	imgLink := fmt.Sprintf(urls[team.Division]["img"], team.ID)
 	if entry, ok := cache[teamname]; ok && time.Since(entry.lastRefresh) < ttl {
