@@ -86,15 +86,22 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, "Error parsing date %s: %s", date, err)
 				return
 			}
-			now := time.Now()
+			userTime := time.Now().UTC()
+			log.Printf("Current time in UTC: %s", userTime.Format(time.UnixDate))
 			tzs, ok := r.URL.Query()["tz"]
 			if ok && len(tzs[0]) > 0 {
 				tz, err := strconv.Atoi(tzs[0])
-				if err != nil {
-					now = now.Add(-time.Minute * time.Duration(tz))
+				if err == nil {
+					// get the user's time as if it were in UTC, i.e. 10:30pm
+					// PST would become 10:30pm UTC since the ESPN date is
+					// interpreted as UTC
+					userTime = userTime.Add(-time.Minute * time.Duration(tz))
+					log.Printf("Current time in UTC after translation: %s", userTime.Format(time.UnixDate))
 				}
 			}
-			daysSinceWin := int(now.Sub(t).Hours()) / 24
+			userDate := userTime.Truncate(24 * time.Hour)
+			log.Printf("Current date in UTC: %s", userDate.Format(time.UnixDate))
+			daysSinceWin := int(userDate.Sub(t).Hours()) / 24
 			resultData := ResultData{Count: daysSinceWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
 			tmpl, err := template.ParseFiles("tmpl/base.html", "tmpl/results.html")
 			if err != nil {
