@@ -54,7 +54,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	teamname := strings.ToLower(vars["teamname"])
+	teamname := vars["teamname"]
 	matchedTeamNames := getRankedTeams(teamname)
 	if len(matchedTeamNames) == 0 {
 		fmt.Fprintf(w, "Could not find a team")

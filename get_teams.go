@@ -15,7 +15,6 @@ var (
 // Team is a struct storing team name and id
 type Team struct {
 	ID       string
-	Name     string
 	Division string
 }
 
@@ -52,7 +51,7 @@ func getCfbTeams() map[string]Team {
 			teamName := html.UnescapeString(body[nameStart:nameEnd])
 			cursor = nameEnd
 			teamSet[teamID] = true
-			teamMap[strings.ToLower(teamName)] = Team{teamID, teamName, "cfb"}
+			teamMap[teamName] = Team{teamID, "cfb"}
 		} else {
 			cursor++
 		}
@@ -88,7 +87,7 @@ func getNflTeams() map[string]Team {
 			teamName := html.UnescapeString(body[nameStart:nameEnd])
 			cursor = nameEnd
 			teamSet[teamID] = true
-			teamMap[strings.ToLower(teamName)] = Team{teamID, teamName, "nfl"}
+			teamMap[teamName] = Team{teamID, "nfl"}
 		} else {
 			cursor++
 		}
