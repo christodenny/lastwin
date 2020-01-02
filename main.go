@@ -99,9 +99,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 					log.Printf("Current time in UTC after translation: %s", userTime.Format(time.UnixDate))
 				}
 			}
-			userDate := userTime.Truncate(24 * time.Hour)
-			log.Printf("Current date in UTC: %s", userDate.Format(time.UnixDate))
-			daysSinceWin := int(userDate.Sub(t).Hours()) / 24
+			daysSinceWin := int(userTime.Sub(t).Hours()) / 24
 			resultData := ResultData{Count: daysSinceWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
 			tmpl, err := template.ParseFiles("tmpl/base.html", "tmpl/results.html")
 			if err != nil {
