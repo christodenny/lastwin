@@ -19,8 +19,7 @@ var (
 	allTeams     = map[string]Team{}
 	allTeamNames = []string{}
 	cache        = map[string]CacheEntry{}
-	homeTmpl     *template.Template
-	resultTmpl   *template.Template
+	templates    = map[string]*template.Template{}
 
 	urls = map[string]map[string]string{
 		"cfb": {
@@ -46,7 +45,7 @@ type ResultData struct {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	homeTmpl.ExecuteTemplate(w, "index.html", nil)
+	templates["home"].ExecuteTemplate(w, "index.html", nil)
 }
 
 func lastWinHandler(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +63,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 	if entry, ok := cache[teamname]; ok && time.Since(entry.lastRefresh) < ttl {
 		resultData := ResultData{Count: entry.lastWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
 		log.Printf("Handling %s from cache\n", teamname)
-		resultTmpl.ExecuteTemplate(w, "results.html", resultData)
+		templates["results"].ExecuteTemplate(w, "results.html", resultData)
 		return
 	}
 	for year := time.Now().Year(); year >= 2001; year-- {
@@ -103,7 +102,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 			resultData := ResultData{Count: daysSinceWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
 			cache[teamname] = CacheEntry{time.Now(), daysSinceWin}
 			log.Printf("Handling %s from espn\n", teamname)
-			resultTmpl.ExecuteTemplate(w, "results.html", resultData)
+			templates["results"].ExecuteTemplate(w, "results.html", resultData)
 			return
 		}
 	}
@@ -126,12 +125,12 @@ func main() {
 	if err != nil {
 		log.Fatal("Error parsing template files")
 	}
-	homeTmpl = t
+	templates["home"] = t
 	t, err = template.ParseFiles("tmpl/base.html", "tmpl/results.html")
 	if err != nil {
 		log.Fatal("Error parsing template files")
 	}
-	resultTmpl = t
+	templates["results"] = t
 	loadTeams()
 	loadConfigs()
 	r := mux.NewRouter()
