@@ -19,6 +19,7 @@ var (
 	allTeams     = map[string]Team{}
 	allTeamNames = []string{}
 	cache        = map[string]CacheEntry{}
+	templates    = map[string]*template.Template{}
 
 	urls = map[string]map[string]string{
 		"cfb": {
@@ -44,12 +45,7 @@ type ResultData struct {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("tmpl/base.html", "tmpl/index.html")
-	if err != nil {
-		fmt.Fprintf(w, "Error parsing template file")
-		return
-	}
-	t.ExecuteTemplate(w, "index.html", nil)
+	templates["home"].ExecuteTemplate(w, "index.html", nil)
 }
 
 func lastWinHandler(w http.ResponseWriter, r *http.Request) {
@@ -66,13 +62,8 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 	imgLink := fmt.Sprintf(urls[team.Division]["img"], team.ID)
 	if entry, ok := cache[teamname]; ok && time.Since(entry.lastRefresh) < ttl {
 		resultData := ResultData{Count: entry.lastWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
-		tmpl, err := template.ParseFiles("tmpl/base.html", "tmpl/results.html")
-		if err != nil {
-			fmt.Fprintf(w, "Error parsing template file")
-			return
-		}
 		log.Printf("Handling %s from cache\n", teamname)
-		tmpl.ExecuteTemplate(w, "results.html", resultData)
+		templates["results"].ExecuteTemplate(w, "results.html", resultData)
 		return
 	}
 	for year := time.Now().Year(); year >= 2001; year-- {
@@ -109,14 +100,9 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 				daysSinceWin = 0
 			}
 			resultData := ResultData{Count: daysSinceWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
-			tmpl, err := template.ParseFiles("tmpl/base.html", "tmpl/results.html")
-			if err != nil {
-				fmt.Fprintf(w, "Error parsing template file")
-				return
-			}
 			cache[teamname] = CacheEntry{time.Now(), daysSinceWin}
 			log.Printf("Handling %s from espn\n", teamname)
-			tmpl.ExecuteTemplate(w, "results.html", resultData)
+			templates["results"].ExecuteTemplate(w, "results.html", resultData)
 			return
 		}
 	}
@@ -135,6 +121,16 @@ func autocompleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	t, err := template.ParseFiles("tmpl/base.html", "tmpl/index.html")
+	if err != nil {
+		log.Fatal("Error parsing template files")
+	}
+	templates["home"] = t
+	t, err = template.ParseFiles("tmpl/base.html", "tmpl/results.html")
+	if err != nil {
+		log.Fatal("Error parsing template files")
+	}
+	templates["results"] = t
 	loadTeams()
 	loadConfigs()
 	r := mux.NewRouter()
