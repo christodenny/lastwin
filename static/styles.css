@@ -58,29 +58,45 @@ p {
 }
 
 @media (min-width: 992px) {
-
   #search-group {
     width: 40%;
   }
-
   .autocomplete-box {
     width: 40%;
   }
-
 }
 
 @media (min-width: 768px) {
-
   #search-bar {
     font-size: 1.5em;
   }
-
   #search-group {
     width: 60%;
   }
-
   .autocomplete-box {
     width: 60%;
   }
-
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #272727;
+    color: white;
+  }
+  #search-bar {
+    background: #171717;
+    color: white;
+  }
+  .autocomplete-box {
+    background: #171717;
+    color: white;
+  }
+  .autocomplete-box:hover {
+    background: #444;
+    color: white;
+  }
+  .footer {
+    background: #373737;
+  }
+}
+
