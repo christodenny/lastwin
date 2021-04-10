@@ -55,6 +55,7 @@ p {
   height: 60px;
   line-height: 60px;
   background-color: #f5f5f5;
+  z-index: 3;
 }
 
 @media (min-width: 992px) {
