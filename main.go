@@ -60,6 +60,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 	team := allTeams[teamname]
 	espnLink := fmt.Sprintf(urls[team.Division]["espn"], team.ID)
 	imgLink := fmt.Sprintf(urls[team.Division]["img"], team.ID)
+	// TODO: do smth about thundering herd with this cache
 	if entry, ok := cache[teamname]; ok && time.Since(entry.lastRefresh) < ttl {
 		resultData := ResultData{Count: entry.lastWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
 		log.Printf("Handling %s from cache\n", teamname)
@@ -120,6 +121,21 @@ func autocompleteHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(matchedTeamNames)
 }
 
+func Gzip(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Force serving the gzip version for bootstrap.min.css since it's so big.
+		// Everything else is small enough it doesn't matter.
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") || r.URL.Path != "bootstrap.min.css" {
+			handler.ServeHTTP(w, r)
+			return
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Content-Type", "text/css")
+		r.URL.Path = r.URL.Path + ".gz"
+		handler.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	t, err := template.ParseFiles("tmpl/base.html", "tmpl/index.html")
 	if err != nil {
@@ -139,7 +155,7 @@ func main() {
 	r.HandleFunc("/autocomplete", autocompleteHandler)
 	r.HandleFunc("/{teamname}", lastWinHandler)
 
-	fileServer := http.FileServer(http.Dir("static/"))
+	fileServer := Gzip(http.FileServer(http.Dir("static/")))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
 	log.Printf("Starting server on port %s", port)
