@@ -25,12 +25,12 @@ var (
 		"cfb": {
 			"query": "http://www.espn.com/college-football/team/schedule/_/id/%s/season/%s",
 			"espn":  "http://www.espn.com/college-football/team/_/id/%s",
-			"img":   "http://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/%s.png&h=200&w=200",
+			"img":   "http://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/%s.png",
 		},
 		"nfl": {
 			"query": "https://www.espn.com/nfl/team/schedule/_/name/%s/season/%s",
 			"espn":  "http://www.espn.com/nfl/team/_/id/%s",
-			"img":   "http://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/%s.png&h=200&w=200",
+			"img":   "http://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/%s.png",
 		},
 	}
 )
@@ -42,10 +42,11 @@ type ResultData struct {
 	SchoolID string
 	EspnLink string
 	ImgLink  string
+	URL      string
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	templates["home"].ExecuteTemplate(w, "index.html", nil)
+	templates["home"].ExecuteTemplate(w, "index.html", ResultData{URL: "lastwin.info"})
 }
 
 func lastWinHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +63,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 	imgLink := fmt.Sprintf(urls[team.Division]["img"], team.ID)
 	// TODO: do smth about thundering herd with this cache
 	if entry, ok := cache[teamname]; ok && time.Since(entry.lastRefresh) < ttl {
-		resultData := ResultData{Count: entry.lastWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
+		resultData := ResultData{Count: entry.lastWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink, URL: "lastwin.info" + r.URL.Path + "?" + r.URL.RawQuery}
 		log.Printf("Handling %s from cache\n", teamname)
 		templates["results"].ExecuteTemplate(w, "results.html", resultData)
 		return
@@ -100,7 +101,7 @@ func lastWinHandler(w http.ResponseWriter, r *http.Request) {
 				// occurred)
 				daysSinceWin = 0
 			}
-			resultData := ResultData{Count: daysSinceWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink}
+			resultData := ResultData{Count: daysSinceWin, School: teamname, SchoolID: team.ID, EspnLink: espnLink, ImgLink: imgLink, URL: "lastwin.info" + r.URL.Path + "?" + r.URL.RawQuery}
 			cache[teamname] = CacheEntry{time.Now(), daysSinceWin}
 			log.Printf("Handling %s from espn\n", teamname)
 			templates["results"].ExecuteTemplate(w, "results.html", resultData)

@@ -1,6 +1,12 @@
 {{ template "base" . }}
 {{ define "title" }}
-{{ .School }}
+  {{ .School }}
+{{ end }}
+{{ define "description" }}
+  {{ .Count }} day{{ if (ne .Count 1) }}s{{ end }} since {{ .School }} won
+{{ end }}
+{{ define "image" }}
+  {{ .ImgLink }}
 {{ end }}
 {{ define "content" }}
 <h1>
