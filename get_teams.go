@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	cfbTeamsURL = "http://www.espn.com/college-football/teams"
-	nflTeamsURL = "http://www.espn.com/nfl/teams"
+	cfbTeamsURL = "https://www.espn.com/college-football/teams"
+	nflTeamsURL = "https://www.espn.com/nfl/teams"
 )
 
 // Team is a struct storing team name and id
