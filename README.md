@@ -1,2 +1,2 @@
 # lastwin
-[lastwin.info](http://lastwin.info)
+[lastwin.info](https://lastwin.info)

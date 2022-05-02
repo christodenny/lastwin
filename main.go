@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 var (
@@ -23,14 +24,14 @@ var (
 
 	urls = map[string]map[string]string{
 		"cfb": {
-			"query": "http://www.espn.com/college-football/team/schedule/_/id/%s/season/%s",
-			"espn":  "http://www.espn.com/college-football/team/_/id/%s",
-			"img":   "http://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/%s.png",
+			"query": "https://www.espn.com/college-football/team/schedule/_/id/%s/season/%s",
+			"espn":  "https://www.espn.com/college-football/team/_/id/%s",
+			"img":   "https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/%s.png",
 		},
 		"nfl": {
 			"query": "https://www.espn.com/nfl/team/schedule/_/name/%s/season/%s",
-			"espn":  "http://www.espn.com/nfl/team/_/id/%s",
-			"img":   "http://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/%s.png",
+			"espn":  "https://www.espn.com/nfl/team/_/id/%s",
+			"img":   "https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/%s.png",
 		},
 	}
 )
@@ -159,6 +160,15 @@ func main() {
 	fileServer := Gzip(http.FileServer(http.Dir("static/")))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
-	log.Printf("Starting server on port %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	m := &autocert.Manager{
+		Cache:      autocert.DirCache("."),
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist("www.lastwin.info", "lastwin.info"),
+	}
+	s := &http.Server{
+		Addr:      ":https",
+		TLSConfig: m.TLSConfig(),
+		Handler:   r,
+	}
+	log.Fatal(s.ListenAndServeTLS("", ""))
 }
